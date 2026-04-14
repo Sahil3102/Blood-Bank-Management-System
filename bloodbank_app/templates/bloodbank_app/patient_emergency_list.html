@@ -1,0 +1,65 @@
+{% extends "bloodbank_app/base.html" %}
+{% block title %}My Emergency Posts - Blood Bank{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="sidebar-link" href="{% url 'patient_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="sidebar-link active" href="{% url 'patient_emergency_list' %}"><i class="bi bi-megaphone"></i> My Emergency Posts</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <h1 class="h2"><i class="bi bi-megaphone"></i> My Emergency Posts</h1>
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Emergency Posts History</h5>
+                    <a href="{% url 'patient_emergency_create' %}" class="btn btn-sm btn-danger"><i class="bi bi-plus"></i> New Post</a>
+                </div>
+                <div class="card-body p-0">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Post ID</th>
+                                <th>Patient</th>
+                                <th>Blood Group</th>
+                                <th>Units</th>
+                                <th>Urgency</th>
+                                <th>Status</th>
+                                <th>Responses</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for post in posts %}
+                            <tr>
+                                <td><code>{{ post.post_id }}</code></td>
+                                <td>{{ post.patient_name }}</td>
+                                <td><span class="badge bg-danger">{{ post.blood_group }}</span></td>
+                                <td>{{ post.units_needed }}</td>
+                                <td>{{ post.get_urgency_level_display }}</td>
+                                <td>
+                                    {% if post.is_active %}<span class="badge bg-success">Active</span>
+                                    {% else %}<span class="badge bg-secondary">Closed</span>{% endif %}
+                                </td>
+                                <td>{{ post.response_count }}</td>
+                                <td>
+                                    <a href="{% url 'patient_emergency_detail' post.id %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-eye"></i></a>
+                                    {% if post.is_active %}
+                                    <a href="{% url 'patient_emergency_close' post.id %}" class="btn btn-sm btn-outline-danger"><i class="bi bi-x-lg"></i></a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="8" class="text-center py-4">No emergency posts found</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

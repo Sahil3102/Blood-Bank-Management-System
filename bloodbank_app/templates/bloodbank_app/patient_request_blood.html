@@ -1,0 +1,148 @@
+{% extends "bloodbank_app/base.html" %}
+
+{% block title %}Request Blood - Blood Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <h6 class="sidebar-heading px-3 mt-4 mb-1 text-muted">
+                    Patient Menu
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_dashboard' %}">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_profile' %}">My Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_search' %}">Search Blood</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link active" href="{% url 'patient_request_blood' %}">Request Blood</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_requests' %}">My Requests</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+
+            <h2>Request Blood</h2>
+
+            <div class="card">
+                <div class="card-body">
+
+                    <form method="post">
+                        {% csrf_token %}
+
+                        {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <ul>
+                                {% for field in form %}
+                                    {% for error in field.errors %}
+                                        <li>{{ field.label }}: {{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                                {% for error in form.non_field_errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+
+                        <!-- Blood Group -->
+                        <div class="mb-3">
+                            <label>Blood Group</label>
+                            <select name="blood_group" class="form-control">
+                                <option value="">Select</option>
+                                <option value="A+" {% if form.blood_group.value == "A+" %}selected{% endif %}>A+</option>
+                                <option value="A-" {% if form.blood_group.value == "A-" %}selected{% endif %}>A-</option>
+                                <option value="B+" {% if form.blood_group.value == "B+" %}selected{% endif %}>B+</option>
+                                <option value="B-" {% if form.blood_group.value == "B-" %}selected{% endif %}>B-</option>
+                                <option value="O+" {% if form.blood_group.value == "O+" %}selected{% endif %}>O+</option>
+                                <option value="O-" {% if form.blood_group.value == "O-" %}selected{% endif %}>O-</option>
+                                <option value="AB+" {% if form.blood_group.value == "AB+" %}selected{% endif %}>AB+</option>
+                                <option value="AB-" {% if form.blood_group.value == "AB-" %}selected{% endif %}>AB-</option>
+                            </select>
+                        </div>
+
+                        <!-- Units -->
+                        <div class="mb-3">
+                            <label>Units Required</label>
+                            <input type="number" name="units_required" class="form-control"
+                                   value="{{ form.units_required.value|default:1 }}">
+                        </div>
+
+                        <!-- Component -->
+                        <div class="mb-3">
+                            <label>Component</label>
+                            <select name="component" class="form-control">
+                                <option value="whole" {% if form.component.value == "whole" %}selected{% endif %}>Whole Blood</option>
+                                <option value="plasma" {% if form.component.value == "plasma" %}selected{% endif %}>Plasma</option>
+                                <option value="platelets" {% if form.component.value == "platelets" %}selected{% endif %}>Platelets</option>
+                                <option value="rbc" {% if form.component.value == "rbc" %}selected{% endif %}>Red Blood Cells</option>
+                            </select>
+                        </div>
+
+                        <!-- Priority -->
+                        <div class="mb-3">
+                            <label>Priority</label>
+                            <select name="priority" class="form-control">
+                                <option value="low" {% if form.priority.value == "low" %}selected{% endif %}>Low</option>
+                                <option value="normal" {% if form.priority.value == "normal" %}selected{% endif %}>Normal</option>
+                                <option value="high" {% if form.priority.value == "high" %}selected{% endif %}>High</option>
+                                <option value="critical" {% if form.priority.value == "critical" %}selected{% endif %}>Critical</option>
+                            </select>
+                        </div>
+
+                        <!-- Date -->
+                        <div class="mb-3">
+                            <label>Required Date</label>
+                            <input type="date" name="required_date" class="form-control"
+                                   value="{{ form.required_date.value }}">
+                        </div>
+
+                        <!-- Hospital -->
+                        <div class="mb-3">
+                            <label>Hospital Name</label>
+                            <input type="text" name="hospital_name" class="form-control"
+                                   value="{{ form.hospital_name.value }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label>Hospital Address</label>
+                            <textarea name="hospital_address" class="form-control">{{ form.hospital_address.value }}</textarea>
+                        </div>
+
+                        <!-- Doctor -->
+                        <div class="mb-3">
+                            <label>Doctor Name</label>
+                            <input type="text" name="doctor_name" class="form-control"
+                                   value="{{ form.doctor_name.value }}">
+                        </div>
+
+                        <!-- Reason -->
+                        <div class="mb-3">
+                            <label>Medical Reason</label>
+                            <textarea name="reason" class="form-control">{{ form.reason.value }}</textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Submit Request</button>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

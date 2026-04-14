@@ -1,0 +1,175 @@
+{% extends "bloodbank_app/base.html" %}
+
+{% block title %}Search Blood - Blood Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Patient Menu</span>
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_dashboard' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_profile' %}">
+                            <i class="bi bi-person"></i> My Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link active" href="{% url 'patient_search' %}">
+                            <i class="bi bi-search"></i> Search Blood
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_request_blood' %}">
+                            <i class="bi bi-clipboard-plus"></i> Request Blood
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_requests' %}">
+                            <i class="bi bi-list-check"></i> My Requests
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2"><i class="bi bi-search"></i> Search Blood Availability</h1>
+            </div>
+
+            <!-- Search Form -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form method="get" class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <label class="form-label">Select Blood Group</label>
+                            <select name="blood_group" class="form-select form-select-lg" required>
+                                <option value="">Choose Blood Group</option>
+                                {% for group, name in blood_groups %}
+                                <option value="{{ group }}" {% if selected_group == group %}selected{% endif %}>{{ name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary btn-lg w-100">
+                                <i class="bi bi-search"></i> Search
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            {% if results %}
+            <!-- Results -->
+            <div class="row g-4">
+                <!-- Stock Availability -->
+                <div class="col-lg-4">
+                    <div class="card bg-danger text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-droplet fs-1 mb-3"></i>
+                            <h3 class="card-title">{{ results.blood_group }}</h3>
+                            <h1 class="display-4">{{ results.stock_available }}</h1>
+                            <p class="card-text">Units Available</p>
+                            {% if results.stock_available > 0 %}
+                            <a href="{% url 'patient_request_blood' %}" class="btn btn-light">
+                                <i class="bi bi-clipboard-plus"></i> Request Now
+                            </a>
+                            {% else %}
+                            <button class="btn btn-secondary" disabled>Out of Stock</button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Matching Donors -->
+                <div class="col-lg-8">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-heart"></i> Available Donors ({{ results.matching_donors|length }})</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            {% if results.matching_donors %}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Age</th>
+                                            <th>Gender</th>
+                                            <th>Location</th>
+                                            <th>Contact</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for donor in results.matching_donors %}
+                                        <tr>
+                                            <td><strong>{{ donor.user.get_full_name }}</strong></td>
+                                            <td>{{ donor.age }}</td>
+                                            <td>{{ donor.get_gender_display }}</td>
+                                            <td>{{ donor.user.city }}, {{ donor.user.state }}</td>
+                                            <td>{{ donor.user.phone_number }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-5">
+                                <i class="bi bi-person-x text-muted fs-1"></i>
+                                <p class="mt-2 text-muted">No available donors found for this blood group</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emergency Posts -->
+            {% if results.emergency_posts %}
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card border-danger">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Emergency Needs for {{ results.blood_group }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                {% for post in results.emergency_posts %}
+                                <div class="col-md-6">
+                                    <div class="card emergency-card">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between">
+                                                <h6 class="card-title">{{ post.patient_name }}</h6>
+                                                <span class="badge bg-danger">{{ post.get_urgency_level_display }}</span>
+                                            </div>
+                                            <p class="card-text">
+                                                <i class="bi bi-hospital"></i> {{ post.hospital_name }}<br>
+                                                <i class="bi bi-telephone"></i> {{ post.contact_phone }}<br>
+                                                <i class="bi bi-clock"></i> {{ post.time_remaining }} remaining
+                                            </p>
+                                            <span class="badge bg-danger">{{ post.units_needed }} units needed</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

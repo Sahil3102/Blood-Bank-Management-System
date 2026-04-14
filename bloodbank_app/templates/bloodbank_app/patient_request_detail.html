@@ -1,0 +1,72 @@
+{% extends "bloodbank_app/base.html" %}
+{% block title %}Request Details - Blood Bank{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="sidebar-link" href="{% url 'patient_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="sidebar-link" href="{% url 'patient_requests' %}"><i class="bi bi-arrow-left"></i> Back to Requests</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <h1 class="h2"><i class="bi bi-clipboard-data"></i> Request Details</h1>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Request Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-borderless">
+                                <tr><td><strong>Request ID:</strong></td><td><code>{{ request_obj.request_id }}</code></td></tr>
+                                <tr><td><strong>Blood Group:</strong></td><td><span class="badge bg-danger">{{ request_obj.blood_group }}</span></td></tr>
+                                <tr><td><strong>Units Required:</strong></td><td>{{ request_obj.units_required }}</td></tr>
+                                <tr><td><strong>Units Allocated:</strong></td><td>{{ request_obj.units_allocated }}</td></tr>
+                                <tr><td><strong>Component:</strong></td><td>{{ request_obj.get_component_display }}</td></tr>
+                                <tr><td><strong>Priority:</strong></td><td>{{ request_obj.get_priority_display }}</td></tr>
+                                <tr><td><strong>Status:</strong></td><td>
+                                    {% if request_obj.status == 'pending' %}<span class="badge bg-warning">Pending</span>
+                                    {% elif request_obj.status == 'approved' %}<span class="badge bg-success">Approved</span>
+                                    {% elif request_obj.status == 'rejected' %}<span class="badge bg-danger">Rejected</span>
+                                    {% else %}<span class="badge bg-info">Fulfilled</span>{% endif %}
+                                </td></tr>
+                                <tr><td><strong>Required Date:</strong></td><td>{{ request_obj.required_date }}</td></tr>
+                                <tr><td><strong>Hospital:</strong></td><td>{{ request_obj.hospital_name }}</td></tr>
+                                <tr><td><strong>Doctor:</strong></td><td>{{ request_obj.doctor_name }}</td></tr>
+                                <tr><td><strong>Reason:</strong></td><td>{{ request_obj.reason }}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Allocation Details</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-hover mb-0">
+                                <thead><tr><th>Log ID</th><th>Units</th><th>Allocated By</th><th>Date</th></tr></thead>
+                                <tbody>
+                                    {% for log in allocation_logs %}
+                                    <tr>
+                                        <td><code>{{ log.log_id }}</code></td>
+                                        <td>{{ log.units_allocated }}</td>
+                                        <td>{{ log.allocated_by.get_full_name }}</td>
+                                        <td>{{ log.allocated_at|date:"M d, Y" }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="4" class="text-center py-3">No allocations yet</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

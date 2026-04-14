@@ -1,0 +1,61 @@
+{% extends "bloodbank_app/base.html" %}
+{% block title %}Emergency Posts - Blood Bank{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="sidebar-link" href="{% url 'admin_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="sidebar-link" href="{% url 'admin_blood_stock' %}"><i class="bi bi-droplet"></i> Blood Stock</a></li>
+                    <li class="nav-item"><a class="sidebar-link" href="{% url 'admin_donors' %}"><i class="bi bi-heart"></i> Donors</a></li>
+                    <li class="nav-item"><a class="sidebar-link" href="{% url 'admin_patients' %}"><i class="bi bi-hospital"></i> Patients</a></li>
+                    <li class="nav-item"><a class="sidebar-link" href="{% url 'admin_requests' %}"><i class="bi bi-clipboard-check"></i> Requests</a></li>
+                    <li class="nav-item"><a class="sidebar-link active" href="{% url 'admin_emergency_posts' %}"><i class="bi bi-exclamation-triangle"></i> Emergency</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <h1 class="h2"><i class="bi bi-exclamation-triangle"></i> Emergency Posts</h1>
+            <div class="btn-group mb-4" role="group">
+                <a href="?status=active" class="btn btn-outline-danger {% if status_filter == 'active' %}active{% endif %}">Active</a>
+                <a href="?status=fulfilled" class="btn btn-outline-success {% if status_filter == 'fulfilled' %}active{% endif %}">Fulfilled</a>
+                <a href="?status=expired" class="btn btn-outline-secondary {% if status_filter == 'expired' %}active{% endif %}">Expired</a>
+                <a href="{% url 'admin_emergency_posts' %}" class="btn btn-outline-primary {% if not status_filter %}active{% endif %}">All</a>
+            </div>
+            <div class="row g-4">
+                {% for post in posts %}
+                <div class="col-md-6">
+                    <div class="card emergency-card {% if not post.is_active %}border-secondary{% endif %}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-danger">{{ post.get_urgency_level_display }}</span>
+                                <span class="badge bg-danger fs-6">{{ post.blood_group }}</span>
+                            </div>
+                            <h5 class="card-title">{{ post.patient_name }}</h5>
+                            <p class="card-text">
+                                <i class="bi bi-hospital"></i> {{ post.hospital_name }}<br>
+                                <i class="bi bi-telephone"></i> {{ post.contact_phone }}<br>
+                                <i class="bi bi-clock"></i> {{ post.time_remaining }}<br>
+                                <i class="bi bi-person"></i> Posted by: {{ post.posted_by.get_full_name }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="badge bg-primary">{{ post.units_needed }} units needed</span>
+                                <span class="badge {% if post.is_active %}bg-success{% else %}bg-secondary{% endif %}">
+                                    {% if post.is_active %}Active{% else %}Closed{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="bi bi-check-circle text-success" style="font-size: 5rem;"></i>
+                    <h4 class="mt-3">No Emergency Posts</h4>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

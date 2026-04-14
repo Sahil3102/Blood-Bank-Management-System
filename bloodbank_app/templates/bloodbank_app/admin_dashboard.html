@@ -1,0 +1,285 @@
+{% extends "bloodbank_app/base.html" %}
+
+{% block title %}Admin Dashboard - Blood Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Admin Menu</span>
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="sidebar-link active" href="{% url 'admin_dashboard' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_blood_stock' %}">
+                            <i class="bi bi-droplet"></i> Blood Stock
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_donors' %}">
+                            <i class="bi bi-heart"></i> Donors
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_patients' %}">
+                            <i class="bi bi-hospital"></i> Patients
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_requests' %}">
+                            <i class="bi bi-clipboard-check"></i> Requests
+                            {% if stats.pending_requests > 0 %}
+                            <span class="badge bg-danger ms-2">{{ stats.pending_requests }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_emergency_posts' %}">
+                            <i class="bi bi-exclamation-triangle"></i> Emergency
+                            {% if stats.total_emergency > 0 %}
+                            <span class="badge bg-danger ms-2">{{ stats.total_emergency }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_allocation_logs' %}">
+                            <i class="bi bi-journal-text"></i> Allocation Logs
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2"><i class="bi bi-speedometer2"></i> Admin Dashboard</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="{% url 'admin_create_user' %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-person-plus"></i> Create User
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-4 col-lg-2">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Total Donors</h6>
+                                    <h3>{{ stats.total_donors }}</h3>
+                                </div>
+                                <i class="bi bi-heart fs-1"></i>
+                            </div>
+                            <small>{{ stats.available_donors }} available</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-2">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Patients</h6>
+                                    <h3>{{ stats.total_patients }}</h3>
+                                </div>
+                                <i class="bi bi-hospital fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-2">
+                    <div class="card bg-warning text-dark h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Pending</h6>
+                                    <h3>{{ stats.pending_requests }}</h3>
+                                </div>
+                                <i class="bi bi-clock fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-2">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Approved</h6>
+                                    <h3>{{ stats.approved_requests }}</h3>
+                                </div>
+                                <i class="bi bi-check-circle fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-2">
+                    <div class="card bg-secondary text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Fulfilled</h6>
+                                    <h3>{{ stats.fulfilled_requests }}</h3>
+                                </div>
+                                <i class="bi bi-clipboard-check fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 col-lg-2">
+                    <div class="card bg-danger text-white h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between">
+                                <div>
+                                    <h6 class="card-title">Emergency</h6>
+                                    <h3>{{ stats.total_emergency }}</h3>
+                                </div>
+                                <i class="bi bi-exclamation-triangle fs-1"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Blood Stock Summary -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-droplet"></i> Blood Stock Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                {% for blood in blood_summary %}
+                                <div class="col-6 col-md-3 col-lg-2">
+                                    <div class="border rounded p-3 text-center">
+                                        <h4 class="text-danger mb-1">{{ blood.group }}</h4>
+                                        <p class="mb-0"><strong>{{ blood.units }}</strong> units</p>
+                                        <small class="text-muted">{{ blood.donors }} donors</small>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Recent Requests -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-clipboard-data"></i> Recent Blood Requests</h5>
+                            <a href="{% url 'admin_requests' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Request ID</th>
+                                            <th>Patient</th>
+                                            <th>Blood Group</th>
+                                            <th>Units</th>
+                                            <th>Status</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for req in recent_requests %}
+                                        <tr>
+                                            <td><code>{{ req.request_id }}</code></td>
+                                            <td>{{ req.patient.user.get_full_name }}</td>
+                                            <td><span class="badge bg-danger">{{ req.blood_group }}</span></td>
+                                            <td>{{ req.units_required }}</td>
+                                            <td>
+                                                {% if req.status == 'pending' %}
+                                                    <span class="badge badge-pending">Pending</span>
+                                                {% elif req.status == 'approved' %}
+                                                    <span class="badge badge-approved">Approved</span>
+                                                {% elif req.status == 'rejected' %}
+                                                    <span class="badge badge-rejected">Rejected</span>
+                                                {% else %}
+                                                    <span class="badge badge-fulfilled">Fulfilled</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ req.created_at|date:"M d, Y" }}</td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="6" class="text-center py-3">No recent requests</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Critical Stock & Emergency -->
+                <div class="col-lg-4">
+                    <!-- Critical Stock Alert -->
+                    {% if critical_stock %}
+                    <div class="card border-danger mb-4">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0"><i class="bi bi-exclamation-circle"></i> Expiring Soon</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                {% for stock in critical_stock %}
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge bg-danger">{{ stock.blood_group }}</span>
+                                        <small class="d-block text-muted">{{ stock.component }}</small>
+                                    </div>
+                                    <span class="badge bg-warning text-dark">{{ stock.days_until_expiry }} days</span>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <!-- Recent Emergency Posts -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Emergency Posts</h5>
+                            <a href="{% url 'admin_emergency_posts' %}" class="btn btn-sm btn-outline-danger">View All</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                {% for post in recent_emergency %}
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">{{ post.patient_name }}</h6>
+                                            <small class="text-muted">{{ post.hospital_name }}</small>
+                                        </div>
+                                        <span class="badge bg-danger">{{ post.blood_group }}</span>
+                                    </div>
+                                    <small class="text-muted">{{ post.time_remaining }} remaining</small>
+                                </li>
+                                {% empty %}
+                                <li class="list-group-item text-center py-3">No active emergency posts</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

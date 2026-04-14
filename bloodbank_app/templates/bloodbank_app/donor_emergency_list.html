@@ -1,0 +1,106 @@
+{% extends "bloodbank_app/base.html" %}
+
+{% block title %}Emergency Needs - Blood Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Donor Menu</span>
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'donor_dashboard' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'donor_profile' %}">
+                            <i class="bi bi-person"></i> My Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link active" href="{% url 'donor_emergency_list' %}">
+                            <i class="bi bi-exclamation-triangle"></i> Emergency Needs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'donor_history' %}">
+                            <i class="bi bi-clock-history"></i> Donation History
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2"><i class="bi bi-exclamation-triangle"></i> Emergency Blood Needs</h1>
+                <span class="badge bg-danger">Your Blood Group: {{ donor_blood_group }}</span>
+            </div>
+
+            <div class="alert alert-info mb-4">
+                <i class="bi bi-info-circle"></i> These are urgent blood requests from patients. If you can donate, please respond to help save a life.
+            </div>
+
+            <div class="row g-4">
+                {% for post in posts %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card emergency-card h-100 {% if post.blood_group == donor_blood_group %}border-danger border-2{% endif %}">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <span class="badge bg-danger">{{ post.get_urgency_level_display }}</span>
+                                <span class="badge bg-danger fs-6">{{ post.blood_group }}</span>
+                            </div>
+
+                            <h5 class="card-title">{{ post.patient_name }}</h5>
+
+                            <p class="card-text">
+                                <i class="bi bi-hospital"></i> {{ post.hospital_name }}<br>
+                                <i class="bi bi-geo-alt"></i> {{ post.hospital_address|truncatechars:50 }}<br>
+                                <i class="bi bi-telephone"></i> {{ post.contact_phone }}<br>
+                                <i class="bi bi-clock"></i> <span class="text-danger">{{ post.time_remaining }} remaining</span>
+                            </p>
+
+                            {% if post.medical_notes %}
+                            <div class="alert alert-light border">
+                                <small><strong>Notes:</strong> {{ post.medical_notes|truncatechars:100 }}</small>
+                            </div>
+                            {% endif %}
+
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="badge bg-primary">{{ post.units_needed }} units needed</span>
+
+                                {% if post.id in responded_ids %}
+                                    <button class="btn btn-success btn-sm" disabled>
+                                        <i class="bi bi-check-lg"></i> Responded
+                                    </button>
+                                {% elif post.blood_group == donor_blood_group %}
+                                    <a href="{% url 'donor_respond_emergency' post.id %}" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-heart"></i> Donate Now
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted small">Different blood group</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="text-center py-5">
+                        <i class="bi bi-check-circle text-success" style="font-size: 5rem;"></i>
+                        <h4 class="mt-3">No Active Emergency Posts</h4>
+                        <p class="text-muted">There are currently no urgent blood requests. Check back later.</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,166 @@
+{% extends "bloodbank_app/base.html" %}
+
+{% block title %}Blood Requests - Blood Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Admin Menu</span>
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_dashboard' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_blood_stock' %}">
+                            <i class="bi bi-droplet"></i> Blood Stock
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_donors' %}">
+                            <i class="bi bi-heart"></i> Donors
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_patients' %}">
+                            <i class="bi bi-hospital"></i> Patients
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link active" href="{% url 'admin_requests' %}">
+                            <i class="bi bi-clipboard-check"></i> Requests
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_emergency_posts' %}">
+                            <i class="bi bi-exclamation-triangle"></i> Emergency
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_allocation_logs' %}">
+                            <i class="bi bi-journal-text"></i> Allocation Logs
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2"><i class="bi bi-clipboard-check"></i> Blood Requests</h1>
+            </div>
+
+            <!-- Status Filter -->
+            <div class="btn-group mb-4" role="group">
+                {% for code, name in status_choices %}
+                <a href="?status={{ code }}" class="btn btn-outline-primary {% if status_filter == code %}active{% endif %}">
+                    {{ name }}
+                </a>
+                {% endfor %}
+                <a href="{% url 'admin_requests' %}" class="btn btn-outline-secondary {% if not status_filter %}active{% endif %}">All</a>
+            </div>
+
+            <!-- Requests Table -->
+            <div class="table-container">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Request ID</th>
+                            <th>Patient</th>
+                            <th>Blood Group</th>
+                            <th>Units</th>
+                            <th>Component</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Required Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for req in requests %}
+                        <tr {% if req.is_urgent %}class="table-warning"{% endif %}>
+                            <td><code>{{ req.request_id }}</code></td>
+                            <td>
+                                <strong>{{ req.patient.user.get_full_name }}</strong><br>
+                                <small class="text-muted">{{ req.patient.user.phone_number }}</small>
+                            </td>
+                            <td><span class="badge bg-danger">{{ req.blood_group }}</span></td>
+                            <td>{{ req.units_required }}</td>
+                            <td>{{ req.get_component_display }}</td>
+                            <td>
+                                {% if req.priority == 'critical' %}
+                                    <span class="badge bg-dark">Critical</span>
+                                {% elif req.priority == 'high' %}
+                                    <span class="badge bg-danger">High</span>
+                                {% elif req.priority == 'normal' %}
+                                    <span class="badge bg-primary">Normal</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Low</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if req.status == 'pending' %}
+                                    <span class="badge badge-pending">Pending</span>
+                                {% elif req.status == 'approved' %}
+                                    <span class="badge badge-approved">Approved</span>
+                                {% elif req.status == 'rejected' %}
+                                    <span class="badge badge-rejected">Rejected</span>
+                                {% else %}
+                                    <span class="badge badge-fulfilled">Fulfilled</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ req.required_date }}</td>
+                            <td>
+                                {% if req.status == 'pending' %}
+                                <a href="{% url 'admin_request_approve' req.id %}" class="btn btn-sm btn-success">
+                                    <i class="bi bi-check-lg"></i> Process
+                                </a>
+                                {% else %}
+                                <button class="btn btn-sm btn-secondary" disabled>
+                                    <i class="bi bi-check-all"></i> Done
+                                </button>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="text-center py-4">No requests found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if requests.has_other_pages %}
+            <nav class="mt-3">
+                <ul class="pagination justify-content-center">
+                    {% if requests.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ requests.previous_page_number }}&status={{ status_filter }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    {% for num in requests.paginator.page_range %}
+                    <li class="page-item {% if requests.number == num %}active{% endif %}">
+                        <a class="page-link" href="?page={{ num }}&status={{ status_filter }}">{{ num }}</a>
+                    </li>
+                    {% endfor %}
+                    {% if requests.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ requests.next_page_number }}&status={{ status_filter }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

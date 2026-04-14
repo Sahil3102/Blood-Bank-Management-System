@@ -1,0 +1,155 @@
+{% extends "bloodbank_app/base.html" %}
+
+{% block title %}Approve Request - Blood Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_dashboard' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'admin_requests' %}">
+                            <i class="bi bi-clipboard-check"></i> Back to Requests
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2"><i class="bi bi-clipboard-check"></i> Process Blood Request</h1>
+            </div>
+
+            <div class="row">
+                <!-- Request Details -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Request Details</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Request ID:</strong></td>
+                                    <td><code>{{ request_obj.request_id }}</code></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Patient:</strong></td>
+                                    <td>{{ request_obj.patient.user.get_full_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Contact:</strong></td>
+                                    <td>{{ request_obj.patient.user.phone_number }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Blood Group:</strong></td>
+                                    <td><span class="badge bg-danger">{{ request_obj.blood_group }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Component:</strong></td>
+                                    <td>{{ request_obj.get_component_display }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Units Required:</strong></td>
+                                    <td><strong class="text-danger">{{ request_obj.units_required }}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Priority:</strong></td>
+                                    <td>{{ request_obj.get_priority_display }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Required Date:</strong></td>
+                                    <td>{{ request_obj.required_date }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Hospital:</strong></td>
+                                    <td>{{ request_obj.hospital_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Doctor:</strong></td>
+                                    <td>{{ request_obj.doctor_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Reason:</strong></td>
+                                    <td>{{ request_obj.reason }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Approval Form -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Process Request</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <strong>Available Stock:</strong> {{ available_stock }} units of {{ request_obj.blood_group }} {{ request_obj.get_component_display }}
+                            </div>
+
+                            <form method="post">
+                                {% csrf_token %}
+
+                                <div class="mb-3">
+                                    <label class="form-label">Decision *</label>
+                                    <select name="status" class="form-select" required id="statusSelect">
+                                        <option value="">Select Decision</option>
+                                        <option value="approved">Approve Request</option>
+                                        <option value="rejected">Reject Request</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-3" id="unitsField">
+                                    <label class="form-label">Units to Allocate *</label>
+                                    <input type="number" name="units_allocated" class="form-control" min="1" max="{{ available_stock }}" value="{{ request_obj.units_required }}">
+                                    <small class="text-muted">Maximum available: {{ available_stock }} units</small>
+                                </div>
+
+                                <div class="mb-3" id="rejectionField" style="display: none;">
+                                    <label class="form-label">Rejection Reason *</label>
+                                    <textarea name="rejection_reason" class="form-control" rows="3"></textarea>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-success">
+                                        <i class="bi bi-check-lg"></i> Confirm Decision
+                                    </button>
+                                    <a href="{% url 'admin_requests' %}" class="btn btn-outline-secondary">
+                                        <i class="bi bi-x-lg"></i> Cancel
+                                    </a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('statusSelect').addEventListener('change', function() {
+    var unitsField = document.getElementById('unitsField');
+    var rejectionField = document.getElementById('rejectionField');
+
+    if (this.value === 'approved') {
+        unitsField.style.display = 'block';
+        rejectionField.style.display = 'none';
+    } else if (this.value === 'rejected') {
+        unitsField.style.display = 'none';
+        rejectionField.style.display = 'block';
+    }
+});
+</script>
+{% endblock %}

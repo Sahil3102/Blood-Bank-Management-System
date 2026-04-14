@@ -1,0 +1,282 @@
+{% extends "bloodbank_app/base.html" %}
+
+{% block title %}Patient Dashboard - Blood Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Patient Menu</span>
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="sidebar-link active" href="{% url 'patient_dashboard' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_profile' %}">
+                            <i class="bi bi-person"></i> My Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_search' %}">
+                            <i class="bi bi-search"></i> Search Blood
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_request_blood' %}">
+                            <i class="bi bi-clipboard-plus"></i> Request Blood
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_requests' %}">
+                            <i class="bi bi-list-check"></i> My Requests
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_emergency_create' %}">
+                            <i class="bi bi-exclamation-triangle"></i> Emergency Post
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'patient_emergency_list' %}">
+                            <i class="bi bi-megaphone"></i> My Emergency Posts
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2"><i class="bi bi-hospital"></i> Patient Dashboard</h1>
+            </div>
+
+            <!-- Welcome Banner -->
+            <div class="alert alert-info mb-4">
+                <h4 class="alert-heading">Welcome, {{ user.first_name }}!</h4>
+                <p class="mb-0">Blood Group: <strong>{{ patient.blood_group }}</strong> | 
+                   Hospital: <strong>{{ patient.hospital_name }}</strong> | 
+                   Doctor: <strong>{{ patient.doctor_name }}</strong></p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clipboard-data fs-1 mb-2"></i>
+                            <h3>{{ stats.total_requests }}</h3>
+                            <p class="mb-0">Total Requests</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-dark h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clock fs-1 mb-2"></i>
+                            <h3>{{ stats.pending_requests }}</h3>
+                            <p class="mb-0">Pending</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-check-circle fs-1 mb-2"></i>
+                            <h3>{{ stats.approved_requests }}</h3>
+                            <p class="mb-0">Approved</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-danger text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-exclamation-triangle fs-1 mb-2"></i>
+                            <h3>{{ stats.emergency_posts }}</h3>
+                            <p class="mb-0">Emergency Posts</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-lightning"></i> Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-3">
+                                    <a href="{% url 'patient_search' %}" class="btn btn-outline-primary w-100 py-3">
+                                        <i class="bi bi-search fs-2 d-block mb-2"></i>
+                                        Search Blood
+                                    </a>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="{% url 'patient_request_blood' %}" class="btn btn-outline-success w-100 py-3">
+                                        <i class="bi bi-clipboard-plus fs-2 d-block mb-2"></i>
+                                        Request Blood
+                                    </a>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="{% url 'patient_emergency_create' %}" class="btn btn-outline-danger w-100 py-3">
+                                        <i class="bi bi-exclamation-triangle fs-2 d-block mb-2"></i>
+                                        Emergency Post
+                                    </a>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="{% url 'patient_requests' %}" class="btn btn-outline-info w-100 py-3">
+                                        <i class="bi bi-list-check fs-2 d-block mb-2"></i>
+                                        View Requests
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Recent Requests -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Requests</h5>
+                            <a href="{% url 'patient_requests' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Request ID</th>
+                                            <th>Blood Group</th>
+                                            <th>Units</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for req in recent_requests %}
+                                        <tr>
+                                            <td><code>{{ req.request_id }}</code></td>
+                                            <td><span class="badge bg-danger">{{ req.blood_group }}</span></td>
+                                            <td>{{ req.units_required }}</td>
+                                            <td>
+                                                {% if req.status == 'pending' %}
+                                                    <span class="badge badge-pending">Pending</span>
+                                                {% elif req.status == 'approved' %}
+                                                    <span class="badge badge-approved">Approved</span>
+                                                {% elif req.status == 'rejected' %}
+                                                    <span class="badge badge-rejected">Rejected</span>
+                                                {% else %}
+                                                    <span class="badge badge-fulfilled">Fulfilled</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="text-center py-3">No requests yet</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- My Emergency Posts -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-megaphone"></i> My Emergency Posts</h5>
+                            <a href="{% url 'patient_emergency_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                {% for post in my_emergency %}
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">{{ post.patient_name }}</h6>
+                                            <p class="mb-1 small text-muted">{{ post.hospital_name }}</p>
+                                            <span class="badge {% if post.is_active %}bg-danger{% else %}bg-secondary{% endif %}">
+                                                {% if post.is_active %}Active{% else %}Closed{% endif %}
+                                            </span>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-danger">{{ post.blood_group }}</span>
+                                            <p class="mb-0 small text-muted">{{ post.time_remaining }}</p>
+                                        </div>
+                                    </div>
+                                </li>
+                                {% empty %}
+                                <li class="list-group-item text-center py-4">
+                                    <i class="bi bi-inbox text-muted fs-1"></i>
+                                    <p class="mt-2 mb-0">No emergency posts created</p>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medical Info -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-file-medical"></i> Medical Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Blood Group:</strong></td>
+                                    <td><span class="badge bg-danger">{{ patient.blood_group }}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Date of Birth:</strong></td>
+                                    <td>{{ patient.date_of_birth }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Age:</strong></td>
+                                    <td>{{ patient.age }} years</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Gender:</strong></td>
+                                    <td>{{ patient.get_gender_display }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>Hospital:</strong></td>
+                                    <td>{{ patient.hospital_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Doctor:</strong></td>
+                                    <td>{{ patient.doctor_name }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Condition:</strong></td>
+                                    <td>{{ patient.medical_condition|truncatechars:50 }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

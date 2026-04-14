@@ -1,0 +1,70 @@
+{% extends "bloodbank_app/base.html" %}
+{% block title %}Edit Stock - Blood Bank{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="bi bi-pencil"></i> Edit Blood Stock</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Blood Group</label>
+                                <select name="blood_group" class="form-select" required>
+                                    <option value="A+" {% if stock.blood_group == 'A+' %}selected{% endif %}>A+</option>
+                                    <option value="A-" {% if stock.blood_group == 'A-' %}selected{% endif %}>A-</option>
+                                    <option value="B+" {% if stock.blood_group == 'B+' %}selected{% endif %}>B+</option>
+                                    <option value="B-" {% if stock.blood_group == 'B-' %}selected{% endif %}>B-</option>
+                                    <option value="O+" {% if stock.blood_group == 'O+' %}selected{% endif %}>O+</option>
+                                    <option value="O-" {% if stock.blood_group == 'O-' %}selected{% endif %}>O-</option>
+                                    <option value="AB+" {% if stock.blood_group == 'AB+' %}selected{% endif %}>AB+</option>
+                                    <option value="AB-" {% if stock.blood_group == 'AB-' %}selected{% endif %}>AB-</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Component</label>
+                                <select name="component" class="form-select" required>
+                                    <option value="whole" {% if stock.component == 'whole' %}selected{% endif %}>Whole Blood</option>
+                                    <option value="plasma" {% if stock.component == 'plasma' %}selected{% endif %}>Plasma</option>
+                                    <option value="platelets" {% if stock.component == 'platelets' %}selected{% endif %}>Platelets</option>
+                                    <option value="rbc" {% if stock.component == 'rbc' %}selected{% endif %}>Red Blood Cells</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Units</label>
+                                <input type="number" name="units" class="form-control" value="{{ stock.units }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Collection Date</label>
+                                <input type="date" name="collection_date" class="form-control" value="{{ stock.collection_date|date:'Y-m-d' }}" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Expiry Date</label>
+                            <input type="date" name="expiry_date" class="form-control" value="{{ stock.expiry_date|date:'Y-m-d' }}" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Storage Location</label>
+                            <input type="text" name="storage_location" class="form-control" value="{{ stock.storage_location }}">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Notes</label>
+                            <textarea name="notes" class="form-control" rows="2">{{ stock.notes }}</textarea>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">Update Stock</button>
+                            <a href="{% url 'admin_blood_stock' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

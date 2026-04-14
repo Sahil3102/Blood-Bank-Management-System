@@ -1,0 +1,80 @@
+{% extends "bloodbank_app/base.html" %}
+
+{% block title %}About Us - Blood Bank{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h2 class="mb-0"><i class="bi bi-info-circle"></i> About Us</h2>
+                </div>
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-droplet-fill text-danger" style="font-size: 5rem;"></i>
+                    </div>
+
+                    <h4 class="text-danger mb-3">Our Mission</h4>
+                    <p class="lead">To connect blood donors with patients in need through a seamless, cloud-based platform that ensures timely access to life-saving blood transfusions.</p>
+
+                    <hr class="my-4">
+
+                    <h4 class="text-danger mb-3">What We Do</h4>
+                    <p>Our Blood Bank Management System is a comprehensive cloud-based solution designed to streamline the entire blood donation and distribution process. We provide:</p>
+
+                    <div class="row g-4 mt-2">
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
+                                <div>
+                                    <h6>Real-time Inventory</h6>
+                                    <p class="small text-muted">Track blood stock levels across all blood groups with expiry monitoring.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
+                                <div>
+                                    <h6>Donor Management</h6>
+                                    <p class="small text-muted">Complete donor profiles with availability tracking and donation history.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
+                                <div>
+                                    <h6>Patient Services</h6>
+                                    <p class="small text-muted">Easy blood request submission with approval workflow.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex">
+                                <i class="bi bi-check-circle-fill text-success fs-4 me-3"></i>
+                                <div>
+                                    <h6>Emergency Response</h6>
+                                    <p class="small text-muted">Urgent blood request posting with donor notification system.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <h4 class="text-danger mb-3">Why Choose Us?</h4>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><i class="bi bi-shield-check text-success me-2"></i> Secure cloud-based platform</li>
+                        <li class="list-group-item"><i class="bi bi-lightning text-warning me-2"></i> Real-time updates and notifications</li>
+                        <li class="list-group-item"><i class="bi bi-people text-primary me-2"></i> Large network of verified donors</li>
+                        <li class="list-group-item"><i class="bi bi-clock-history text-info me-2"></i> 24/7 availability and support</li>
+                        <li class="list-group-item"><i class="bi bi-award text-danger me-2"></i> Quality assured blood handling</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

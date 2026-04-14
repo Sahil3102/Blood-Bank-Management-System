@@ -1,0 +1,212 @@
+{% extends "bloodbank_app/base.html" %}
+
+{% block title %}Donor Dashboard - Blood Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
+                    <span>Donor Menu</span>
+                </h6>
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="sidebar-link active" href="{% url 'donor_dashboard' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'donor_profile' %}">
+                            <i class="bi bi-person"></i> My Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'donor_emergency_list' %}">
+                            <i class="bi bi-exclamation-triangle"></i> Emergency Needs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="sidebar-link" href="{% url 'donor_history' %}">
+                            <i class="bi bi-clock-history"></i> Donation History
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2"><i class="bi bi-heart"></i> Donor Dashboard</h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="{% url 'donor_availability' %}" class="btn btn-sm {% if donor.is_available %}btn-success{% else %}btn-secondary{% endif %}">
+                        <i class="bi bi-toggle-{% if donor.is_available %}on{% else %}off{% endif %}"></i> 
+                        {% if donor.is_available %}Available{% else %}Unavailable{% endif %}
+                    </a>
+                </div>
+            </div>
+
+            <!-- Welcome Banner -->
+            <div class="alert alert-danger mb-4">
+                <h4 class="alert-heading">Welcome back, {{ user.first_name }}!</h4>
+                <p class="mb-0">Blood Group: <strong>{{ donor.blood_group }}</strong> | 
+                   Total Donations: <strong>{{ stats.total_donations }}</strong> | 
+                   Status: <strong>{% if donor.is_available %}Available{% else %}Not Available{% endif %}</strong></p>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-4 mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-danger text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-droplet fs-1 mb-2"></i>
+                            <h3>{{ stats.total_donations }}</h3>
+                            <p class="mb-0">Total Donations</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-calendar-check fs-1 mb-2"></i>
+                            <h5>{{ stats.last_donation|default:"Never" }}</h5>
+                            <p class="mb-0">Last Donation</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-dark h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-calendar-plus fs-1 mb-2"></i>
+                            <h5>{{ stats.next_eligible }}</h5>
+                            <p class="mb-0">Next Eligible</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card {% if stats.can_donate %}bg-success{% else %}bg-secondary{% endif %} text-white h-100">
+                        <div class="card-body text-center">
+                            <i class="bi bi-heart-pulse fs-1 mb-2"></i>
+                            <h5>{% if stats.can_donate %}Yes{% else %}No{% endif %}</h5>
+                            <p class="mb-0">Can Donate</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <!-- Recent Donations -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-clock-history"></i> Recent Donations</h5>
+                            <a href="{% url 'donor_history' %}" class="btn btn-sm btn-outline-primary">View All</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Component</th>
+                                            <th>Units</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for donation in recent_donations %}
+                                        <tr>
+                                            <td>{{ donation.collection_date }}</td>
+                                            <td>{{ donation.get_component_display }}</td>
+                                            <td>{{ donation.units }}</td>
+                                            <td>
+                                                {% if donation.is_expired %}
+                                                    <span class="badge bg-secondary">Expired</span>
+                                                {% elif donation.days_until_expiry <= 3 %}
+                                                    <span class="badge bg-warning">Critical</span>
+                                                {% else %}
+                                                    <span class="badge bg-success">Good</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="4" class="text-center py-3">No donations yet</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Matching Emergency Posts -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card h-100 border-danger">
+                        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Emergency Needs ({{ donor.blood_group }})</h5>
+                            <a href="{% url 'donor_emergency_list' %}" class="btn btn-sm btn-light">View All</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <ul class="list-group list-group-flush">
+                                {% for post in matching_emergency %}
+                                <li class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h6 class="mb-1">{{ post.patient_name }}</h6>
+                                            <p class="mb-1 small text-muted">{{ post.hospital_name }}</p>
+                                            <small class="text-danger"><i class="bi bi-clock"></i> {{ post.time_remaining }} remaining</small>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge bg-danger">{{ post.units_needed }} units</span>
+                                            <a href="{% url 'donor_respond_emergency' post.id %}" class="btn btn-sm btn-danger mt-2">
+                                                <i class="bi bi-heart"></i> Respond
+                                            </a>
+                                        </div>
+                                    </div>
+                                </li>
+                                {% empty %}
+                                <li class="list-group-item text-center py-4">
+                                    <i class="bi bi-check-circle text-success fs-1"></i>
+                                    <p class="mt-2 mb-0">No emergency posts matching your blood group</p>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Eligibility Info -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle"></i> Donation Eligibility</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Age: {{ donor.age }} years</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Weight: {{ donor.weight_kg }} kg</li>
+                                <li><i class="bi bi-check-circle-fill text-success"></i> Blood Group: {{ donor.blood_group }}</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="bi bi-{% if stats.can_donate %}check-circle-fill text-success{% else %}x-circle-fill text-danger{% endif %}"></i> 
+                                    Last Donation: {{ stats.last_donation|default:"Never" }}</li>
+                                <li><i class="bi bi-info-circle-fill text-info"></i> Next Eligible: {{ stats.next_eligible }}</li>
+                                <li><i class="bi bi-{% if donor.is_available %}check-circle-fill text-success{% else %}x-circle-fill text-danger{% endif %}"></i> 
+                                    Availability: {% if donor.is_available %}Available{% else %}Not Available{% endif %}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

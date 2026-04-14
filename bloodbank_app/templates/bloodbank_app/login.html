@@ -1,0 +1,58 @@
+{% extends "bloodbank_app/base.html" %}
+
+{% block title %}Login - Blood Bank{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h4 class="mb-0"><i class="bi bi-box-arrow-in-right"></i> Login</h4>
+                </div>
+                <div class="card-body p-4">
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <div class="mb-3">
+                            <label for="id_username" class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" name="username" class="form-control" id="id_username" required autofocus>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="id_password" class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input type="password" name="password" class="form-control" id="id_password" required>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <div class="text-center">
+                        <p class="mb-2">Don't have an account?</p>
+                        <div class="d-grid gap-2">
+                            <a href="{% url 'donor_register' %}" class="btn btn-outline-success btn-sm">
+                                <i class="bi bi-heart"></i> Register as Donor
+                            </a>
+                            <a href="{% url 'patient_register' %}" class="btn btn-outline-info btn-sm">
+                                <i class="bi bi-hospital"></i> Register as Patient
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

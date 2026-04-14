@@ -1,0 +1,69 @@
+{% extends "bloodbank_app/base.html" %}
+{% block title %}Patient Details - Blood Bank{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="sidebar-link" href="{% url 'admin_dashboard' %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                    <li class="nav-item"><a class="sidebar-link" href="{% url 'admin_patients' %}"><i class="bi bi-arrow-left"></i> Back to Patients</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <h1 class="h2"><i class="bi bi-person"></i> Patient Details</h1>
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">{{ patient.user.get_full_name }}</h5>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-borderless">
+                                <tr><td><strong>Blood Group:</strong></td><td><span class="badge bg-danger">{{ patient.blood_group }}</span></td></tr>
+                                <tr><td><strong>Age:</strong></td><td>{{ patient.age }} years</td></tr>
+                                <tr><td><strong>Gender:</strong></td><td>{{ patient.get_gender_display }}</td></tr>
+                                <tr><td><strong>Hospital:</strong></td><td>{{ patient.hospital_name }}</td></tr>
+                                <tr><td><strong>Doctor:</strong></td><td>{{ patient.doctor_name }}</td></tr>
+                                <tr><td><strong>Contact:</strong></td><td>{{ patient.user.phone_number }}</td></tr>
+                                <tr><td><strong>Email:</strong></td><td>{{ patient.user.email }}</td></tr>
+                                <tr><td><strong>Condition:</strong></td><td>{{ patient.medical_condition }}</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Blood Request History</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-hover mb-0">
+                                <thead><tr><th>Request ID</th><th>Units</th><th>Status</th><th>Date</th></tr></thead>
+                                <tbody>
+                                    {% for req in requests %}
+                                    <tr>
+                                        <td><code>{{ req.request_id }}</code></td>
+                                        <td>{{ req.units_required }}</td>
+                                        <td>
+                                            {% if req.status == 'pending' %}<span class="badge bg-warning">Pending</span>
+                                            {% elif req.status == 'approved' %}<span class="badge bg-success">Approved</span>
+                                            {% elif req.status == 'rejected' %}<span class="badge bg-danger">Rejected</span>
+                                            {% else %}<span class="badge bg-info">Fulfilled</span>{% endif %}
+                                        </td>
+                                        <td>{{ req.created_at|date:"M d, Y" }}</td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="4" class="text-center py-3">No requests found</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

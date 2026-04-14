@@ -1,0 +1,18 @@
+runtime: python311
+
+handlers:
+- url: /static
+  static_dir: staticfiles/
+
+- url: /media
+  static_dir: media/
+
+- url: /.*
+  script: auto
+
+env_variables:
+  DJANGO_SETTINGS_MODULE: 'bloodbank.settings'
+  SECRET_KEY: 'your-secret-key-here'
+  DEBUG: 'False'
+
+entrypoint: gunicorn -b :$PORT bloodbank.wsgi

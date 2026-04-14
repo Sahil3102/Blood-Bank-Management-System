@@ -1,0 +1,201 @@
+{% extends "bloodbank_app/base.html" %}
+
+{% block title %}Home - Blood Bank Management System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container hero-content">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-4">Save Lives Through Blood Donation</h1>
+                <p class="lead mb-4">Join our network of heroes. Connect with donors and patients in real-time. Every donation can save up to three lives.</p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'donor_register' %}" class="btn btn-light btn-lg">
+                        <i class="bi bi-heart"></i> Become a Donor
+                    </a>
+                    <a href="{% url 'patient_register' %}" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-hospital"></i> Request Blood
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="bi bi-droplet-fill" style="font-size: 15rem; opacity: 0.3;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Statistics Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="stat-card donors h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-value">{{ stats.total_donors }}</div>
+                            <div class="stat-label">Available Donors</div>
+                        </div>
+                        <i class="bi bi-heart stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card patients h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-value">{{ stats.total_patients }}</div>
+                            <div class="stat-label">Registered Patients</div>
+                        </div>
+                        <i class="bi bi-hospital stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card requests h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-value">{{ stats.fulfilled_requests }}</div>
+                            <div class="stat-label">Requests Fulfilled</div>
+                        </div>
+                        <i class="bi bi-check-circle stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card stock h-100">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <div class="stat-value">{{ stats.total_units_collected }}</div>
+                            <div class="stat-label">Units Collected</div>
+                        </div>
+                        <i class="bi bi-droplet stat-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Blood Stock Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <h2 class="text-center mb-5">
+            <i class="bi bi-droplet-fill text-danger"></i> Current Blood Stock
+        </h2>
+        <div class="row g-4">
+            {% for group, data in blood_stock.items %}
+            <div class="col-6 col-md-3 col-lg-2">
+                <div class="blood-group-card h-100">
+                    <i class="bi bi-droplet-fill blood-group-icon"></i>
+                    <div class="blood-group-title">{{ group }}</div>
+                    <div class="mt-2">
+                        <span class="badge bg-primary">{{ data.units }} units</span>
+                    </div>
+                    <small class="text-muted d-block mt-1">{{ data.donors }} donors</small>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Emergency Section -->
+{% if emergency_posts %}
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">
+            <i class="bi bi-exclamation-triangle-fill text-danger"></i> Emergency Blood Needs
+        </h2>
+        <div class="row g-4">
+            {% for post in emergency_posts %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card emergency-card h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="badge badge-emergency">{{ post.get_urgency_level_display }}</span>
+                            <span class="badge bg-danger">{{ post.blood_group }}</span>
+                        </div>
+                        <h5 class="card-title">{{ post.patient_name }}</h5>
+                        <p class="card-text">
+                            <i class="bi bi-hospital"></i> {{ post.hospital_name }}<br>
+                            <i class="bi bi-telephone"></i> {{ post.contact_phone }}<br>
+                            <i class="bi bi-clock"></i> {{ post.time_remaining }} remaining
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">{{ post.units_needed }} units needed</span>
+                            {% if user.is_authenticated and user.is_donor %}
+                                {% if post.blood_group == user.donor_profile.blood_group %}
+                                <a href="{% url 'donor_respond_emergency' post.id %}" class="btn btn-sm btn-danger">
+                                    <i class="bi bi-heart"></i> Donate
+                                </a>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="text-center mt-4">
+            <a href="{% url 'donor_emergency_list' %}" class="btn btn-outline-danger">
+                View All Emergency Posts <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Features Section -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5">How It Works</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-person-plus text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4>Register</h4>
+                    <p class="text-muted">Create your profile as a donor or patient. It takes less than 2 minutes.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-search text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4>Search & Match</h4>
+                    <p class="text-muted">Find matching blood types and available donors in your area instantly.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 text-center p-4">
+                    <div class="mb-3">
+                        <i class="bi bi-heart-fill text-danger" style="font-size: 3rem;"></i>
+                    </div>
+                    <h4>Save Lives</h4>
+                    <p class="text-muted">Connect directly and make blood donations that save precious lives.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="py-5">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to Make a Difference?</h2>
+        <p class="lead text-muted mb-4">Join thousands of donors and patients in our life-saving network.</p>
+        <div class="d-flex justify-content-center gap-3">
+            <a href="{% url 'donor_register' %}" class="btn btn-danger btn-lg">
+                <i class="bi bi-heart"></i> Register as Donor
+            </a>
+            <a href="{% url 'patient_register' %}" class="btn btn-outline-danger btn-lg">
+                <i class="bi bi-hospital"></i> Register as Patient
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
